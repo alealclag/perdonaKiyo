@@ -1,9 +1,8 @@
 import socket
 import RPi.GPIO as GPIO
 import json
-
-info = json.loads(
-    '{"manufacturer": "Volkswagen", "model": "Golf", "color": "White", "plate": "0000 AAA"}')
+socket.gethostname()
+info = json.load(open("{}.json".format(socket.gethostname())))
 
 
 def sendSorry(channel):
@@ -26,4 +25,4 @@ coche1.bind(('', 1050))
 while True:
     print("Receiving...")
     message, sender = coche1.recvfrom(1024)
-    print(message)
+    print(message.decode("utf-8"))
