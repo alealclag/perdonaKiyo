@@ -1,0 +1,12 @@
+Códigos correspondientes a cada tipo de mensaje posible:
+
+1: Perdón
+    Formato: "1/Sorry! by [Fabricante] [Modelo] ([Color])/[Matrícula]"
+2: Límite de velocidad en la vía
+    Formato: "2/[Límite]
+3.1: Incidencias en la vía (vehículo)
+    Formato: "3.1/[Tipo vehículo] [tipo incidencia] nearby"
+3.2: Incidencias en la vía (obras)
+    Formato: "3.2/Roadwork nearby"
+3.3: Incidencias en la vía (otro):
+    Formato: "3.3/Incident nearby on the road"
