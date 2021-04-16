@@ -1,4 +1,5 @@
 {
+  "type": "Car",
   "manufacturer": "Citröen",
   "model": "C15",
   "color": "White",
