@@ -1,19 +1,30 @@
 Códigos correspondientes a cada tipo de mensaje posible:
 
 1: Perdón
-    Formato: "1/Sorry! by [Fabricante] [Modelo] ([Color])/[Matrícula]"
+    Formato: "1/[Fabricante]/[Modelo]/[Color]/[Matrícula]"
 
 2: Límite de velocidad en la vía
-    Formato: "2/[Límite]
+    Formato: "2/[Límite]"
 
-3.1: Incidencias en la vía (Avería)
-    Formato: "3.1/[Tipo vehículo] breakdown nearby/[Matrícula]"
+Indicendias:
 
-3.2: Incidencias en la vía (Accidente)
-    Formato: "3.2/Accident nearby/[Matrícula]"
+    3.1: Incidencias en la vía (Avería)
+        Formato: "3.1/[Tipo vehículo]/[Matrícula]"
+        
+    3.1.0: Fin incidencia en la vía  (Avería)
+        Formato: "3.1.0/[Matrícula]"
 
-3.3: Incidencias en la vía (obras)
-    Formato: "3.2/Roadwork nearby/[ID obra]"
 
-3.4: Incidencias en la vía (otro):
-    Formato: "3.3/Incident nearby on the road/[Fecha y hora reporte]"
+    3.2: Incidencias en la vía (Accidente)
+        Formato: "3.2/[Tipo vehículo]/[Matrícula]"
+
+    3.2.0: Fin incidencias en la vía (Accidente)
+        Formato: "3.2.0/[Matrícula]"
+
+
+    3.3: Incidencias en la vía (obras)
+        Formato: "3.3/[ID obra]"
+
+
+    3.4: Incidencias en la vía (otro):
+        Formato: "3.4/[ID incidente]"

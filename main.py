@@ -2,7 +2,7 @@ import socket
 import RPi.GPIO as GPIO
 import json
 import os
-
+import time
 # Carga de la información del vehículo
 info = json.load(
     open("Vehicle Information Files/{}.json".format(socket.gethostname())))
@@ -51,6 +51,7 @@ def toggleAccidentAlert(channel):
     accidented = not accidented
     if accidented:
         broken = False
+
         print("Sending Accident Alert")
         sock.sendto(bytes("3.1", encoding='utf8'), ('192.168.1.1', 1060))
         sendAccident()
@@ -82,6 +83,7 @@ print("Starting reception of messages..")
 # Bucle para la recepción de señales
 while True:
     try:
+        time.sleep(5)
         message, sender = sock.recvfrom(1024)
         messageArray = str(message.decode("utf-8")).split("/")
 
