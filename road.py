@@ -38,21 +38,24 @@ def sendIncidents():
 
 
 def recvMessage():
+
     try:
+
         message, sender = sock.recvfrom(1024)
         messageArray = str(message.decode("utf-8")).split("/")
 
         if messageArray[0] == "3.1":
-            vehicleIncidentList.append(messageArray[2])
+
             signMessage.value = "Breakdown {} nearby".format(messageArray[1])
+            vehicleIncidentList.append(messageArray[2])
 
         elif (messageArray[0] == "3.1.0") or (messageArray[0] == "3.2.0"):
             vehicleIncidentList.remove(messageArray[1])
             signMessage.value = ""
 
         elif messageArray[0] == "3.2":
-            vehicleIncidentList.append(messageArray[2])
             signMessage.value = "Accident {} nearby".format(messageArray[1])
+            vehicleIncidentList.append(messageArray[2])
 
     except BlockingIOError:
         pass
@@ -110,35 +113,44 @@ def submitSpeedLimit():
 # Configuración del socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-sock.bind(('', 1060))
+sock.bind(('', 1050))
 sock.settimeout(0)
 
 
 roadGui = App(title="perdonaKiyo")
 
-rwTextBox = TextBox(roadGui)
+signMessage = Text(roadGui, align="top")
+voidLabel = Text(roadGui, text="")
+
+rwBox = Box(roadGui, align="left")
+rwTextBox = TextBox(rwBox)
 rwButton = PushButton(
-    roadGui, command=submitRoadWork, text="Submit roadwork")
+    rwBox, command=submitRoadWork, text="Submit roadwork")
 removeRwButton = PushButton(
-    roadGui, command=removeRoadWork, text="Remove roadwork")
+    rwBox, command=removeRoadWork, text="Remove roadwork")
 
-otherIncidentTextBox = TextBox(roadGui)
+otherIncidentBox = Box(roadGui, align="right")
+otherIncidentTextBox = TextBox(otherIncidentBox)
 otherIncButton = PushButton(
-    roadGui, command=submitOtherIncident, text="Submit other incident")
+    otherIncidentBox, command=submitOtherIncident, text="Submit other incident")
 removeOtherIncButton = PushButton(
-    roadGui, command=removeOtherIncident, text="Remove other incident")
+    otherIncidentBox, command=removeOtherIncident, text="Remove other incident")
 
-speedLimitTextBox = TextBox(roadGui)
+
 speedLimButton = PushButton(
-    roadGui, command=submitSpeedLimit, text="Submit Speed Limit")
+    roadGui, command=submitSpeedLimit, text="Submit Speed Limit", align="bottom")
+speedLimitTextBox = TextBox(roadGui, align="bottom")
 
-rwListText = Text(roadGui, text=rwList)
-otherIncidentListText = Text(roadGui, text=otherIncidentList)
-
-signMessage = Text(roadGui)
 
 speedLimitIndicator = Text(
     roadGui, text="Speed Limit: {} Km/h".format(speedLimit))
+voidLabel = Text(roadGui, text="")
+rwLabel = Text(roadGui, text="Roadwork:")
+rwListText = Text(roadGui, text=rwList)
+voidLabel = Text(roadGui, text="")
+otherIncidentsLabel = Text(roadGui, text="Other Incidents:")
+otherIncidentListText = Text(roadGui, text=otherIncidentList)
+voidLabel = Text(roadGui, text="")
 
 roadGui.repeat(1000, recvMessage)
 roadGui.repeat(1000, sendSpeed)

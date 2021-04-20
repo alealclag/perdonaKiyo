@@ -25,10 +25,10 @@ def sendSorry():
 
 
 def sendBreakDown():
-    sock.sendto(
-        bytes("3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.1', 1060))
-    sock.sendto(bytes("3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'),
-                ('192.168.1.255', 1050))
+    sock.sendto(bytes(
+        "3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.1', 1060))
+    sock.sendto(bytes(
+        "3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
 
 
 def endBreakDown():
@@ -51,7 +51,9 @@ def toggleBroken():
     broken = not broken
     if broken:
         breakdownButton.text_color = "red"
+        accidentButton.text_color = "black"
         sendBreakDown()
+        endAccident()
     else:
         breakdownButton.text_color = "black"
         endBreakDown()
@@ -62,7 +64,9 @@ def toggleAccident():
     accidented = not accidented
     if accidented:
         accidentButton.text_color = "red"
+        breakdownButton.text_color = "black"
         sendAccident()
+        endBreakDown()
     else:
         accidentButton.text_color = "black"
         endAccident()

@@ -9,5 +9,8 @@ sock.settimeout(0)
 
 while True:
     time.sleep(1)
-    message, sender = sock.recvfrom(1024)
-    print(message)
+    try:
+        message, sender = sock.recvfrom(1024)
+        print(message)
+    except:
+        pass
