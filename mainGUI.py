@@ -25,25 +25,24 @@ def sendSorry():
 
 
 def sendBreakDown():
-    sock.sendto(bytes(
-        "3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.1', 1060))
+
     sock.sendto(bytes(
         "3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
 
 
 def endBreakDown():
     sock.sendto(
-        bytes("3.1.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.1', 1060))
+        bytes("3.1.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
 
 
 def sendAccident():
     sock.sendto(
-        bytes("3.2/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.1', 1060))
+        bytes("3.2/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
 
 
 def endAccident():
     sock.sendto(
-        bytes("3.2.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.1', 1060))
+        bytes("3.2.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
 
 
 def toggleBroken():
@@ -122,13 +121,13 @@ def recvMessage():
 
         # Obra
         elif (messageArray[0] == "3.3") and not(messageArray[1] in roadWorkLog):
-            gui.info("Roadwork Warning", "Roadwork nearby")
             roadWorkLog.append(messageArray[1])
+            gui.info("Roadwork Warning", "Roadwork nearby")
 
         # Incidencia
         elif (messageArray[0] == "3.4") and not(messageArray[1] in incidentLog):
-            gui.info("Incident Warning", "Incident nearby")
             incidentLog.append(messageArray[1])
+            gui.info("Incident Warning", "Incident nearby")
 
     except BlockingIOError:
         pass
