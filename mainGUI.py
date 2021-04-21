@@ -180,16 +180,21 @@ speedLimitIndicator = Text(
 settingsWindow = Window(gui, title="Settings")
 settingsWindow.hide()
 
-enableSorry = CheckBox(settingsWindow, text="Enable sorry")
+enableSorry = CheckBox(settingsWindow, text="Enable sorry", )
+enableSorry.value = True
 voidLabel = Text(settingsWindow, text="")
 enableBreakDownWarning = CheckBox(
     settingsWindow, text="Enable breakdown warning")
+enableBreakDownWarning.value = True
 enableAccidentAlert = CheckBox(
     settingsWindow, text="Enable accident alert")
+enableAccidentAlert.value = True
 enableRoadWork = CheckBox(
     settingsWindow, text="Enable roadwork warning")
+enableRoadWork.value = True
 enableOtherIncidents = CheckBox(
     settingsWindow, text="Enable other incidents warnings")
+enableOtherIncidents.value = True
 
 gui.repeat(1000, recvMessage)
 gui.repeat(1000, sendWarningOrAlert)
