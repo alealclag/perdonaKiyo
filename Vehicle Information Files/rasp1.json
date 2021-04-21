@@ -1,4 +1,5 @@
 {
+  "type": "Car",
   "manufacturer": "Volkswagen",
   "model": "Golf",
   "color": "White",

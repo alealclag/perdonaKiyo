@@ -1,4 +1,5 @@
 {
+  "type": "Car",
   "manufacturer": "Audi",
   "model": "Q3",
   "color": "Blue",
