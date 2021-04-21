@@ -1,6 +1,6 @@
 import socket
 import json
-from guizero import App, PushButton, Text, Slider, Box
+from guizero import App, PushButton, Text, Slider, Box, CheckBox, Window
 import time
 
 # Carga de la información del vehículo
@@ -90,7 +90,7 @@ def recvMessage():
         messageArray = str(message.decode("utf-8")).split("/")
 
         # Señal de perdón
-        if (messageArray[0] == "1") and (messageArray[4] != myPlate):
+        if (messageArray[0] == "1") and (messageArray[4] != myPlate) and enableSorry.value:
             gui.info("", "Sorry! by {} {} ({})".format(
                 messageArray[1], messageArray[2], messageArray[3]))
 
@@ -108,22 +108,22 @@ def recvMessage():
                 pass
 
         # Incidencia Avería
-        elif (messageArray[0] == "3.1") and not(messageArray[2] in vehicleIncidentLog):
+        elif (messageArray[0] == "3.1") and not(messageArray[2] in vehicleIncidentLog) and enableBreakDownWarning.value:
             vehicleIncidentLog.append(messageArray[2])
             gui.info("", "Broken {} nearby".format(messageArray[1]))
 
         # Incidencia Accidente
-        elif (messageArray[0] == "3.2") and not(messageArray[2] in vehicleIncidentLog):
+        elif (messageArray[0] == "3.2") and not(messageArray[2] in vehicleIncidentLog) and enableAccidentAlert:
             vehicleIncidentLog.append(messageArray[2])
             gui.info("", "Accidented {} nearby".format(messageArray[1]))
 
         # Obra
-        elif (messageArray[0] == "3.3") and not(messageArray[1] in roadWorkLog):
+        elif (messageArray[0] == "3.3") and not(messageArray[1] in roadWorkLog) and enableRoadWork:
             roadWorkLog.append(messageArray[1])
             gui.info("", "Roadwork nearby")
 
-        # Incidencia
-        elif (messageArray[0] == "3.4") and not(messageArray[1] in incidentLog):
+        # Otro tipo de incidencia
+        elif (messageArray[0] == "3.4") and not(messageArray[1] in incidentLog) and enableOtherIncidents:
             incidentLog.append(messageArray[1])
             gui.info("", "Incident nearby")
 
@@ -142,6 +142,10 @@ def sendWarningOrAlert():
         pass
 
 
+def openSettings():
+    settingsWindow.show()
+
+
 # Configuración del socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -154,6 +158,7 @@ gui = App(title="perdonaKiyo")
 
 buttonsBox = Box(gui, width="50", align="top", layout="grid", border=True)
 
+
 sorryButton = PushButton(buttonsBox, command=sendSorry,
                          text="Sorry!", grid=[0, 0])
 
@@ -162,7 +167,9 @@ breakdownButton = PushButton(
     buttonsBox2, command=toggleBroken, text="Breakdown", grid=[1, 0])
 accidentButton = PushButton(
     buttonsBox2, command=toggleAccident, text="Accident", grid=[2, 0])
+voidLabel = Text(gui, text="")
 
+settingsButton = PushButton(gui, command=openSettings, text="Settings")
 
 speedBox = Box(gui, align="bottom", border=True)
 throttle = Slider(speedBox, command=throttleController, start=0, end=180)
@@ -170,6 +177,19 @@ speedIndicator = Text(speedBox, text="Speed: {} Km/h".format(speed))
 speedLimitIndicator = Text(
     speedBox, text="Speed Limit: {} Km/h".format(speedLimit))
 
+settingsWindow = Window(gui, title="Settings")
+settingsWindow.hide()
+
+enableSorry = CheckBox(settingsWindow, text="Enable sorry")
+voidLabel = Text(settingsWindow, text="")
+enableBreakDownWarning = CheckBox(
+    settingsWindow, text="Enable breakdown warning")
+enableAccidentAlert = CheckBox(
+    settingsWindow, text="Enable accident alert")
+enableRoadWork = CheckBox(
+    settingsWindow, text="Enable roadwork warning")
+enableOtherIncidents = CheckBox(
+    settingsWindow, text="Enable other incidents warnings")
 
 gui.repeat(1000, recvMessage)
 gui.repeat(1000, sendWarningOrAlert)
