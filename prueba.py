@@ -10,7 +10,7 @@ sock.settimeout(0)
 while True:
     time.sleep(1)
     try:
-        message, sender = sock.recvfrom(1024)
+        message = sock.recvfrom(1024)
         print(message)
     except:
         pass

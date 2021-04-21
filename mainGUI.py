@@ -18,56 +18,56 @@ cont = 0
 
 
 def sendSorry():
-    print("Sorry sent")
-    sock.sendto(bytes("1/{}/{}/{}/{}".format(
-        info["manufacturer"], info["model"], info["color"], info["plate"]), encoding='utf8'),
-        ('192.168.1.255', 1050))
+    sock.sendto(bytes("1/{}/{}/{}/{}".format(info["manufacturer"], info["model"],
+                info["color"], info["plate"]), encoding='utf8'),                ('192.168.1.255', 1050))
+    gui.info("", "Sorry sent")
 
 
 def sendBreakDown():
-
     sock.sendto(bytes(
         "3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
 
 
 def endBreakDown():
-    sock.sendto(
-        bytes("3.1.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+    sock.sendto(bytes(
+        "3.1.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+    breakdownButton.text_color = "black"
 
 
 def sendAccident():
-    sock.sendto(
-        bytes("3.2/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+    sock.sendto(bytes(
+        "3.2/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
 
 
 def endAccident():
-    sock.sendto(
-        bytes("3.2.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+    sock.sendto(bytes(
+        "3.2.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+    accidentButton.text_color = "black"
 
 
 def toggleBroken():
-    global broken
+    global broken, accidented
     broken = not broken
     if broken:
-        breakdownButton.text_color = "red"
-        accidentButton.text_color = "black"
+        if accidented:
+            accidented = False
+            endAccident()
         sendBreakDown()
-        endAccident()
+        breakdownButton.text_color = "red"
     else:
-        breakdownButton.text_color = "black"
         endBreakDown()
 
 
 def toggleAccident():
-    global accidented
+    global accidented, broken
     accidented = not accidented
     if accidented:
-        accidentButton.text_color = "red"
-        breakdownButton.text_color = "black"
+        if broken:
+            broken = False
+            endBreakDown()
         sendAccident()
-        endBreakDown()
+        accidentButton.text_color = "red"
     else:
-        accidentButton.text_color = "black"
         endAccident()
 
 
@@ -91,7 +91,7 @@ def recvMessage():
 
         # Señal de perdón
         if (messageArray[0] == "1") and (messageArray[4] != myPlate):
-            gui.info("Sorry!", "Sorry! by {} {} ({})".format(
+            gui.info("", "Sorry! by {} {} ({})".format(
                 messageArray[1], messageArray[2], messageArray[3]))
 
         # Límite de velocidad
@@ -110,24 +110,22 @@ def recvMessage():
         # Incidencia Avería
         elif (messageArray[0] == "3.1") and not(messageArray[2] in vehicleIncidentLog):
             vehicleIncidentLog.append(messageArray[2])
-            gui.info("Breakdown Warning",
-                     "Broken {} nearby".format(messageArray[1]))
+            gui.info("", "Broken {} nearby".format(messageArray[1]))
 
         # Incidencia Accidente
         elif (messageArray[0] == "3.2") and not(messageArray[2] in vehicleIncidentLog):
             vehicleIncidentLog.append(messageArray[2])
-            gui.info("Accident Alert",
-                     "Accidented {} nearby".format(messageArray[1]))
+            gui.info("", "Accidented {} nearby".format(messageArray[1]))
 
         # Obra
         elif (messageArray[0] == "3.3") and not(messageArray[1] in roadWorkLog):
             roadWorkLog.append(messageArray[1])
-            gui.info("Roadwork Warning", "Roadwork nearby")
+            gui.info("", "Roadwork nearby")
 
         # Incidencia
         elif (messageArray[0] == "3.4") and not(messageArray[1] in incidentLog):
             incidentLog.append(messageArray[1])
-            gui.info("Incident Warning", "Incident nearby")
+            gui.info("", "Incident nearby")
 
     except BlockingIOError:
         pass
@@ -156,14 +154,15 @@ gui = App(title="perdonaKiyo")
 
 buttonsBox = Box(gui, width="50", align="top", layout="grid", border=True)
 
-sorryButton = PushButton(
-    buttonsBox, command=sendSorry, text="Sorry!", grid=[0, 0])
+sorryButton = PushButton(buttonsBox, command=sendSorry,
+                         text="Sorry!", grid=[0, 0])
 
 buttonsBox2 = Box(gui, width="50", align="top", layout="grid", border=True)
 breakdownButton = PushButton(
     buttonsBox2, command=toggleBroken, text="Breakdown", grid=[1, 0])
 accidentButton = PushButton(
     buttonsBox2, command=toggleAccident, text="Accident", grid=[2, 0])
+
 
 speedBox = Box(gui, align="bottom", border=True)
 throttle = Slider(speedBox, command=throttleController, start=0, end=180)
