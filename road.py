@@ -38,24 +38,22 @@ def sendIncidents():
 
 
 def recvMessage():
-
     try:
-
         message, sender = sock.recvfrom(1024)
         messageArray = str(message.decode("utf-8")).split("/")
 
         if messageArray[0] == "3.1":
-
-            signMessage.value = "Breakdown {} nearby".format(messageArray[1])
-            vehicleIncidentList.append(messageArray[2])
+            signMessage.value = "Broken {} nearby".format(messageArray[1])
 
         elif (messageArray[0] == "3.1.0") or (messageArray[0] == "3.2.0"):
-            vehicleIncidentList.remove(messageArray[1])
+            try:
+                vehicleIncidentList.remove(messageArray[1])
+            except ValueError:
+                pass
             signMessage.value = ""
 
         elif messageArray[0] == "3.2":
-            signMessage.value = "Accident {} nearby".format(messageArray[1])
-            vehicleIncidentList.append(messageArray[2])
+            signMessage.value = "Accidented {} nearby".format(messageArray[1])
 
     except BlockingIOError:
         pass
@@ -119,9 +117,6 @@ sock.settimeout(0)
 
 roadGui = App(title="perdonaKiyo")
 
-signMessage = Text(roadGui, align="top")
-voidLabel = Text(roadGui, text="")
-
 rwBox = Box(roadGui, align="left")
 rwTextBox = TextBox(rwBox)
 rwButton = PushButton(
@@ -141,7 +136,8 @@ speedLimButton = PushButton(
     roadGui, command=submitSpeedLimit, text="Submit Speed Limit", align="bottom")
 speedLimitTextBox = TextBox(roadGui, align="bottom")
 
-
+signMessage = Text(roadGui)
+voidLabel = Text(roadGui, text="")
 speedLimitIndicator = Text(
     roadGui, text="Speed Limit: {} Km/h".format(speedLimit))
 voidLabel = Text(roadGui, text="")
@@ -152,8 +148,8 @@ otherIncidentsLabel = Text(roadGui, text="Other Incidents:")
 otherIncidentListText = Text(roadGui, text=otherIncidentList)
 voidLabel = Text(roadGui, text="")
 
-roadGui.repeat(1000, recvMessage)
-roadGui.repeat(1000, sendSpeed)
+roadGui.repeat(500, recvMessage)
+roadGui.repeat(2000, sendSpeed)
 roadGui.repeat(1000, sendIncidents)
 
 roadGui.display()

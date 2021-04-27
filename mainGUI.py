@@ -15,33 +15,34 @@ vehicleIncidentLog = [myPlate]
 roadWorkLog = []
 incidentLog = []
 cont = 0
+brAddress = '192.168.0.255'
 
 
 def sendSorry():
     sock.sendto(bytes("1/{}/{}/{}/{}".format(info["manufacturer"], info["model"],
-                info["color"], info["plate"]), encoding='utf8'),                ('192.168.1.255', 1050))
+                info["color"], info["plate"]), encoding='utf8'), (brAddress, 1050))
     gui.info("", "Sorry sent")
 
 
 def sendBreakDown():
     sock.sendto(bytes(
-        "3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+        "3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), (brAddress, 1050))
 
 
 def endBreakDown():
     sock.sendto(bytes(
-        "3.1.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+        "3.1.0/{}".format(info["plate"]), encoding='utf8'), (brAddress, 1050))
     breakdownButton.text_color = "black"
 
 
 def sendAccident():
     sock.sendto(bytes(
-        "3.2/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+        "3.2/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), (brAddress, 1050))
 
 
 def endAccident():
     sock.sendto(bytes(
-        "3.2.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+        "3.2.0/{}".format(info["plate"]), encoding='utf8'), (brAddress, 1050))
     accidentButton.text_color = "black"
 
 
@@ -131,7 +132,7 @@ def recvMessage():
         pass
 
 
-def sendWarningOrAlert():
+def sendBDorAcc():
     try:
         if broken:
             sendBreakDown()
@@ -197,6 +198,6 @@ enableOtherIncidents = CheckBox(
 enableOtherIncidents.value = True
 
 gui.repeat(1000, recvMessage)
-gui.repeat(1000, sendWarningOrAlert)
+gui.repeat(1000, sendBDorAcc)
 
 gui.display()
