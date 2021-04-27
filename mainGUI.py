@@ -147,6 +147,10 @@ def openSettings():
     settingsWindow.show()
 
 
+def closeSettings():
+    settingsWindow.hide()
+
+
 # Configuración del socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
@@ -196,6 +200,9 @@ enableRoadWork.value = True
 enableOtherIncidents = CheckBox(
     settingsWindow, text="Enable other incidents warnings")
 enableOtherIncidents.value = True
+
+closeSettingsButton = PushButton(
+    settingsWindow, command=closeSettings, text="Close Settings", align="bottom")
 
 gui.repeat(1000, recvMessage)
 gui.repeat(1000, sendBDorAcc)

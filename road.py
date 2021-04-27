@@ -11,12 +11,13 @@ otherIncident = False
 vehicleIncidentList = []
 rwList = []
 otherIncidentList = []
+brAddress = '192.168.0.255'
 
 
 def sendSpeed():
     try:
         sock.sendto(bytes("2/{}".format(speedLimit), encoding='utf8'),
-                    ('192.168.1.255', 1050))
+                    (brAddress, 1050))
     except BlockingIOError:
         pass
 
@@ -27,11 +28,11 @@ def sendIncidents():
         if roadWork:
             for id in rwList:
                 sock.sendto(bytes("3.3/{}".format(id), encoding='utf8'),
-                            ('192.168.1.255', 1050))
+                            (brAddress, 1050))
         if otherIncident:
             for id in otherIncidentList:
                 sock.sendto(bytes("3.4/{}".format(id), encoding='utf8'),
-                            ('192.168.1.255', 1050))
+                            (brAddress, 1050))
 
     except BlockingIOError:
         pass
