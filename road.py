@@ -17,6 +17,7 @@ def sendSpeed():
     try:
         sock.sendto(bytes("2/{}".format(speedLimit), encoding='utf8'),
                     (brAddress, 1050))
+
     except BlockingIOError:
         pass
 
@@ -28,7 +29,7 @@ def sendIncidents():
             for id in rwList:
                 sock.sendto(bytes("3.3/{}".format(id), encoding='utf8'),
                             (brAddress, 1050))
-                print(id)
+
         if otherIncident:
             for id in otherIncidentList:
                 sock.sendto(bytes("3.4/{}".format(id), encoding='utf8'),
@@ -108,9 +109,12 @@ def removeOtherIncident():
 
 def submitSpeedLimit():
     global speedLimit
-    speedLimit = int(speedLimitTextBox.value)
-    speedLimitIndicator.value = "Speed Limit: {} Km/h".format(speedLimit)
-    speedLimitTextBox.value = ""
+    try:
+        speedLimit = int(speedLimitTextBox.value)
+        speedLimitIndicator.value = "Speed Limit: {} Km/h".format(speedLimit)
+        speedLimitTextBox.value = ""
+    except ValueError:
+        pass
 
 
 # Configuración del socket
@@ -155,6 +159,6 @@ voidLabel = Text(roadGui, text="")
 
 roadGui.repeat(500, recvMessage)
 roadGui.repeat(2000, sendSpeed)
-roadGui.repeat(2000, sendIncidents)
+roadGui.repeat(5000, sendIncidents)
 
 roadGui.display()
