@@ -2,6 +2,7 @@ import socket
 import json
 from guizero import App, PushButton, Text, Slider, Box, CheckBox, Window
 import time
+import simpleaudio as sa
 
 # Carga de la información del vehículo
 info = json.load(
@@ -15,33 +16,37 @@ vehicleIncidentLog = [myPlate]
 roadWorkLog = []
 incidentLog = []
 cont = 0
+brAddress = '192.168.0.255'
+sorrySound = sa.WaveObject.from_wave_file("sounds/sorry.wav")
+speedSound = sa.WaveObject.from_wave_file("sounds/speeding.wav")
+incidentSound = sa.WaveObject.from_wave_file("sounds/incident.wav")
 
 
 def sendSorry():
     sock.sendto(bytes("1/{}/{}/{}/{}".format(info["manufacturer"], info["model"],
-                info["color"], info["plate"]), encoding='utf8'),                ('192.168.1.255', 1050))
+                info["color"], info["plate"]), encoding='utf8'), (brAddress, 1050))
     gui.info("", "Sorry sent")
 
 
 def sendBreakDown():
     sock.sendto(bytes(
-        "3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+        "3.1/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), (brAddress, 1050))
 
 
 def endBreakDown():
     sock.sendto(bytes(
-        "3.1.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+        "3.1.0/{}".format(info["plate"]), encoding='utf8'), (brAddress, 1050))
     breakdownButton.text_color = "black"
 
 
 def sendAccident():
     sock.sendto(bytes(
-        "3.2/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+        "3.2/{}/{}".format(info["type"], info["plate"]), encoding='utf8'), (brAddress, 1050))
 
 
 def endAccident():
     sock.sendto(bytes(
-        "3.2.0/{}".format(info["plate"]), encoding='utf8'), ('192.168.1.255', 1050))
+        "3.2.0/{}".format(info["plate"]), encoding='utf8'), (brAddress, 1050))
     accidentButton.text_color = "black"
 
 
@@ -79,6 +84,7 @@ def throttleController(slider_value):
 
     if int(speed) > int(speedLimit):
         speedIndicator.text_color = "red"
+
     else:
         speedIndicator.text_color = "black"
 
@@ -91,6 +97,8 @@ def recvMessage():
 
         # Señal de perdón
         if (messageArray[0] == "1") and (messageArray[4] != myPlate) and enableSorry.value:
+            playSorry = sorrySound.play()
+            playSorry.wait_done()
             gui.info("", "Sorry! by {} {} ({})".format(
                 messageArray[1], messageArray[2], messageArray[3]))
 
@@ -110,28 +118,36 @@ def recvMessage():
         # Incidencia Avería
         elif (messageArray[0] == "3.1") and not(messageArray[2] in vehicleIncidentLog) and enableBreakDownWarning.value:
             vehicleIncidentLog.append(messageArray[2])
+            playIncident = incidentSound.play()
+            playIncident.wait_done()
             gui.info("", "Broken {} nearby".format(messageArray[1]))
 
         # Incidencia Accidente
         elif (messageArray[0] == "3.2") and not(messageArray[2] in vehicleIncidentLog) and enableAccidentAlert:
             vehicleIncidentLog.append(messageArray[2])
+            playIncident = incidentSound.play()
+            playIncident.wait_done()
             gui.info("", "Accidented {} nearby".format(messageArray[1]))
 
         # Obra
         elif (messageArray[0] == "3.3") and not(messageArray[1] in roadWorkLog) and enableRoadWork:
             roadWorkLog.append(messageArray[1])
+            playIncident = incidentSound.play()
+            playIncident.wait_done()
             gui.info("", "Roadwork nearby")
 
         # Otro tipo de incidencia
         elif (messageArray[0] == "3.4") and not(messageArray[1] in incidentLog) and enableOtherIncidents:
             incidentLog.append(messageArray[1])
+            playIncident = incidentSound.play()
+            playIncident.wait_done()
             gui.info("", "Incident nearby")
 
     except BlockingIOError:
         pass
 
 
-def sendWarningOrAlert():
+def sendBDorAcc():
     try:
         if broken:
             sendBreakDown()
@@ -142,8 +158,18 @@ def sendWarningOrAlert():
         pass
 
 
+def playSpeedingSound():
+    if int(speed) > int(speedLimit):
+        playSpeeding = speedSound.play()
+        playSpeeding.wait_done()
+
+
 def openSettings():
     settingsWindow.show()
+
+
+def closeSettings():
+    settingsWindow.hide()
 
 
 # Configuración del socket
@@ -196,7 +222,11 @@ enableOtherIncidents = CheckBox(
     settingsWindow, text="Enable other incidents warnings")
 enableOtherIncidents.value = True
 
-gui.repeat(1000, recvMessage)
-gui.repeat(1000, sendWarningOrAlert)
+closeSettingsButton = PushButton(
+    settingsWindow, command=closeSettings, text="Close Settings", align="bottom")
+
+gui.repeat(500, recvMessage)
+gui.repeat(1000, sendBDorAcc)
+gui.repeat(3000, playSpeedingSound)
 
 gui.display()
