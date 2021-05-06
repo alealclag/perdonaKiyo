@@ -17,6 +17,7 @@ roadWorkLog = []
 incidentLog = []
 cont = 0
 brAddress = '192.168.1.255'
+carAddress = '192.168.1.2'
 sorrySound = sa.WaveObject.from_wave_file("sounds/sorry.wav")
 speedSound = sa.WaveObject.from_wave_file("sounds/speeding.wav")
 incidentSound = sa.WaveObject.from_wave_file("sounds/incident.wav")
@@ -25,6 +26,8 @@ incidentSound = sa.WaveObject.from_wave_file("sounds/incident.wav")
 def sendSorry():
     sock.sendto(bytes("1/{}/{}/{}/{}".format(info["manufacturer"], info["model"],
                 info["color"], info["plate"]), encoding='utf8'), (brAddress, 1050))
+    sock.sendto(bytes("1/{}/{}/{}/{}".format(info["manufacturer"], info["model"],
+                info["color"], info["plate"]), encoding='utf8'), (carAddress, 1050))
     gui.info("", "Sorry sent")
 
 
