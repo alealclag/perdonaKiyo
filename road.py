@@ -10,7 +10,7 @@ roadWork = False
 otherIncident = False
 rwList = set()
 otherIncidentList = set()
-brAddress = '192.168.0.255'
+brAddress = '192.168.1.255'
 
 
 def sendSpeed():
