@@ -6,3 +6,4 @@ cp confAdhoc_2 /etc/network/interfaces
 
 #Reiniciamos el servicio de red para aplicar los cambios
 service networking restart
+sudo reboot
