@@ -2,6 +2,9 @@ import socket
 import time
 from guizero import App, PushButton, Text, Slider, Box, TextBox
 from datetime import datetime
+import smtplib
+import ssl
+
 location = "A-4 Km. 455"
 speedLimit = 120
 breakdown = False
@@ -11,6 +14,24 @@ otherIncident = False
 rwList = set()
 otherIncidentList = set()
 brAddress = '192.168.1.255'
+sentEmail = False
+accidentList = set()
+BDList = set()
+emailSentList = set()
+
+
+def sendAccidentEmail(vehicle):
+    global location
+    # Create a secure SSL context
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context) as server:
+        server.login("a4road455@gmail.com", "perdonaKiyo2021")
+        if vehicle == "":
+            server.sendmail("a4road455@gmail.com", "alalla@hotmail.es",
+                            "Accident at {}".format(location))
+        else:
+            server.sendmail("a4road455@gmail.com", "alalla@hotmail.es",
+                            "{} accident at {}".format(vehicle, location))
 
 
 def sendSpeed():
@@ -40,24 +61,35 @@ def sendIncidents():
 
 
 def recvMessage():
-    global accident
+    global accident, emailSentList
     try:
         message, sender = sock.recvfrom(1024)
         messageArray = str(message.decode("utf-8")).split("/")
 
         if messageArray[0] == "3.1" and not accident:
+            BDList.add(messageArray[2])
             signMessage.value = "Broken {} nearby".format(messageArray[1])
 
         elif messageArray[0] == "3.1.0":
-            signMessage.value = ""
+            BDList.remove(messageArray[1])
+            if not BDList:
+                signMessage.value = ""
 
         elif messageArray[0] == "3.2.0":
-            signMessage.value = ""
-            accident = False
+            accidentList.remove(messageArray[1])
+            emailSentList.remove(messageArray[1])
+            if not accidentList:
+                signMessage.value = ""
+                accident = False
 
         elif messageArray[0] == "3.2":
+            accidentList.add(messageArray[2])
             signMessage.value = "Accidented {} nearby".format(messageArray[1])
             accident = True
+            for accidentPlate in accidentList:
+                if accidentPlate not in emailSentList:
+                    sendAccidentEmail(messageArray[1])
+                    emailSentList.add(messageArray[2])
 
     except BlockingIOError:
         pass
@@ -156,6 +188,9 @@ voidLabel = Text(roadGui, text="")
 otherIncidentsLabel = Text(roadGui, text="Other Incidents:")
 otherIncidentListText = Text(roadGui)
 voidLabel = Text(roadGui, text="")
+
+accidentButton = PushButton(
+    roadGui, command=sendAccidentEmail, args=[""], text="Send alert to emergencies")
 
 roadGui.repeat(500, recvMessage)
 roadGui.repeat(2000, sendSpeed)
