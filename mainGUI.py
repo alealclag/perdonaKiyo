@@ -230,6 +230,6 @@ closeSettingsButton = PushButton(
 
 gui.repeat(500, recvMessage)
 gui.repeat(1000, sendBDorAcc)
-gui.repeat(3000, playSpeedingSound)
+gui.repeat(5000, playSpeedingSound)
 
 gui.display()
