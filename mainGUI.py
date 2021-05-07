@@ -17,7 +17,6 @@ roadWorkLog = []
 incidentLog = []
 cont = 0
 brAddress = '192.168.1.255'
-carAddress = '192.168.1.2'
 sorrySound = sa.WaveObject.from_wave_file("sounds/sorry.wav")
 speedSound = sa.WaveObject.from_wave_file("sounds/speeding.wav")
 incidentSound = sa.WaveObject.from_wave_file("sounds/incident.wav")
@@ -26,8 +25,7 @@ incidentSound = sa.WaveObject.from_wave_file("sounds/incident.wav")
 def sendSorry():
     sock.sendto(bytes("1/{}/{}/{}/{}".format(info["manufacturer"], info["model"],
                 info["color"], info["plate"]), encoding='utf8'), (brAddress, 1050))
-    sock.sendto(bytes("1/{}/{}/{}/{}".format(info["manufacturer"], info["model"],
-                info["color"], info["plate"]), encoding='utf8'), (carAddress, 1050))
+
     gui.info("", "Sorry sent")
 
 
@@ -126,21 +124,21 @@ def recvMessage():
             gui.info("", "Broken {} nearby".format(messageArray[1]))
 
         # Incidencia Accidente
-        elif (messageArray[0] == "3.2") and not(messageArray[2] in vehicleIncidentLog) and enableAccidentAlert:
+        elif (messageArray[0] == "3.2") and not(messageArray[2] in vehicleIncidentLog) and enableAccidentAlert.value:
             vehicleIncidentLog.append(messageArray[2])
             playIncident = incidentSound.play()
             playIncident.wait_done()
             gui.info("", "Accidented {} nearby".format(messageArray[1]))
 
         # Obra
-        elif (messageArray[0] == "3.3") and not(messageArray[1] in roadWorkLog) and enableRoadWork:
+        elif (messageArray[0] == "3.3") and not(messageArray[1] in roadWorkLog) and enableRoadWork.value:
             roadWorkLog.append(messageArray[1])
             playIncident = incidentSound.play()
             playIncident.wait_done()
             gui.info("", "Roadwork nearby")
 
         # Otro tipo de incidencia
-        elif (messageArray[0] == "3.4") and not(messageArray[1] in incidentLog) and enableOtherIncidents:
+        elif (messageArray[0] == "3.4") and not(messageArray[1] in incidentLog) and enableOtherIncidents.value:
             incidentLog.append(messageArray[1])
             playIncident = incidentSound.play()
             playIncident.wait_done()
