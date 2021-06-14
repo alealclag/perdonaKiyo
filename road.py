@@ -20,6 +20,14 @@ BDList = set()
 emailSentList = set()
 
 
+def checkRWorInc():
+    if (not accident) and (not breakdown):
+        if roadWork:
+            signMessage.value = "Roadwork nearby"
+        elif otherIncident:
+            signMessage.value = "Incident nearby"
+
+
 def sendAccidentEmail(vehicle):
     global location
     # Create a secure SSL context
@@ -66,14 +74,18 @@ def recvMessage():
         message, sender = sock.recvfrom(1024)
         messageArray = str(message.decode("utf-8")).split("/")
 
-        if messageArray[0] == "3.1" and not accident:
+        if messageArray[0] == "3.1":
             BDList.add(messageArray[2])
-            signMessage.value = "Broken {} nearby".format(messageArray[1])
+            breakdown = True
+            if not accident:
+                signMessage.value = "Broken {} nearby".format(messageArray[1])
 
         elif messageArray[0] == "3.1.0":
             BDList.remove(messageArray[1])
             if not BDList:
                 signMessage.value = ""
+                breakdown = False
+                checkRWorInc()
 
         elif messageArray[0] == "3.2.0":
             accidentList.remove(messageArray[1])
@@ -81,6 +93,7 @@ def recvMessage():
             if not accidentList:
                 signMessage.value = ""
                 accident = False
+                checkRWorInc()
 
         elif messageArray[0] == "3.2":
             accidentList.add(messageArray[2])
@@ -102,6 +115,7 @@ def submitRoadWork():
         rwListText.value = rwList
         rwTextBox.value = ""
         roadWork = True
+        checkRWorInc()
 
 
 def removeRoadWork():
@@ -113,6 +127,8 @@ def removeRoadWork():
         if not rwList:
             roadWork = False
             rwListText.value = ""
+            signMessage.value = ""
+            checkRWorInc()
     except KeyError:
         pass
 
@@ -124,6 +140,7 @@ def submitOtherIncident():
         otherIncidentListText.value = otherIncidentList
         otherIncidentTextBox.value = ""
         otherIncident = True
+        checkRWorInc()
 
 
 def removeOtherIncident():
@@ -135,6 +152,8 @@ def removeOtherIncident():
         if not otherIncidentList:
             otherIncident = False
             otherIncidentListText.value = ""
+            signMessage.value = ""
+            checkRWorInc()
     except KeyError:
         pass
 
